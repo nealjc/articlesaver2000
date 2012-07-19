@@ -71,12 +71,12 @@ def send_to_instapapper(urls, name, pw):
     with the given name and password.
     The function pauses between each call, so the runtime
     is proportional to the number of urls.
-
+    
     urls - a list of tuples [(url, title), ...]
     name - string, username
     pw - string, username
 
-    Returns a two tuple (status, [failed urls])
+    Returns status code to indicate success/failure
     """
     params = {}
     params['username'] = name
@@ -93,22 +93,22 @@ def send_to_instapapper(urls, name, pw):
             module_logger.info("Successful")
         elif resp.status_code == 400:
             module_logger.error("Invalid request")
-            return (REQ_ERROR, urls)
+            return REQ_ERROR 
         elif resp.status_code == 403:
             module_logger.error("Bad credentials")
-            return (BAD_CREDENTIALS, urls)
+            return BAD_CREDENTIALS
         elif resp.status_code == 500:
             module_logger.error("Temporarily unavailable")
-            return (SERVICE_DOWN, urls)
+            return SERVICE_DOWN
         else:
             #failed to contact server at all
             module_logger.error("Unable to contact server {0}".format(
                 resp.status_code))
-            return (SERVICE_DOWN, urls)
+            return SERVICE_DOWN
         urls.pop(0)
         time.sleep(_INSTAPAPPER_RATE)
 
-    return (SUCCESS, [])
+    return SUCCESS
 
 if __name__ == '__main__':
     logging.basicConfig("%(asctime)-15s %(message)s")
