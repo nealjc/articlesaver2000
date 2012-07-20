@@ -25,7 +25,8 @@ def scrape_reddit(subreddit, min_votes):
                 continue
         except:
             continue
-        
+        link = div_tag.parent.parent.findAll('a', attrs={'class':'title'})[0]
+        urls.append((link['href'], link.text))
     return urls
 
 def scrape_hackernews(min_votes):
@@ -49,5 +50,5 @@ def scrape_hackernews(min_votes):
 if __name__ == '__main__':
     logging.basicConfig()
     #print scrape_hackernews(100)
-    print scrape_reddit('boston',100)
+    print scrape_reddit('programming',100)
     
