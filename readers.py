@@ -110,5 +110,3 @@ def send_to_instapapper(urls, name, pw):
 
     return SUCCESS
 
-if __name__ == '__main__':
-    logging.basicConfig("%(asctime)-15s %(message)s")
