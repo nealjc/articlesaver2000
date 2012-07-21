@@ -9,7 +9,7 @@ import re
 
 module_logger = logging.getLogger('scrape')
 
-def scrape_reddit(subreddit, min_votes):
+def _scrape_reddit(subreddit, min_votes):
     resp = requests.get('http://reddit.com/r/{0}'.format(subreddit))
     if resp.status_code != 200:
         module_logger.error("Unable to reach reddit subreddit {0}".format(
@@ -29,6 +29,9 @@ def scrape_reddit(subreddit, min_votes):
         urls.append((link['href'], link.text))
     return urls
 
+def scrape_reddit_programming(min_votes):
+    return _scrape_reddit('programming', min_votes)
+
 def scrape_hackernews(min_votes):
     resp = requests.get('http://news.ycombinator.com')
     if resp.status_code != 200:
@@ -47,8 +50,3 @@ def scrape_hackernews(min_votes):
         urls.append((url, title))
     return urls
 
-if __name__ == '__main__':
-    logging.basicConfig()
-    #print scrape_hackernews(100)
-    print scrape_reddit('programming',100)
-    
