@@ -25,6 +25,8 @@ def get_a_number(prompt):
 
 def run_daemon(scrapers, pocket_user, pocket_pw):
 
+    #TODO: deamonize
+    #TODO: check that username/pw is valid before starting daemon
     module_logger.info("Starting loop")
     while 1:
         for scraper in scrapers:
