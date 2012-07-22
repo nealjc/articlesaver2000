@@ -16,6 +16,12 @@ REQ_ERROR = 1
 SERVICE_DOWN = 2
 SUCCESS = 3
 
+#set of all URLs that have been submitted to Pocket by this app
+#on the first call to send_to_pocket this is populated
+pocket_urls = set()
+#since parameter for Pocket get request
+last_pocket_url_check = None
+
 module_logger = logging.getLogger('readers')
 
 def _pocket_submitted_urls(name, pw, since=None):
@@ -26,6 +32,8 @@ def _pocket_submitted_urls(name, pw, since=None):
         since_param = '&since={0}'.format(since)
     else:
         since_param = ''
+    module_logger.debug("Requesting already submitted URLs since {0}".format(
+        since))
     resp = requests.get('https://readitlaterlist.com/v2/get?username={0}&password={1}&apikey={2}&myAppOnly=1{3}'.format(name, pw, _POCKET_KEY, 
                                                  since_param))
     if resp.status_code != 200:
@@ -48,13 +56,23 @@ def send_to_pocket(urls, name, pw):
     pw - string, username
 
     Returns status code to indicate success/failure
-    """    
+    """
+    global last_pocket_url_check
+    
+    already_submitted, last_pocket_url_check = _pocket_submitted_urls(
+        name, pw, last_pocket_url_check)
+    for url in already_submitted:
+        pocket_urls.add(url)
+        
     new_urls = {}
     for idx, url in enumerate(urls):
         if not url[0].startswith("http://"):
             formatted_url = "http://" + url[0]
         else:
             formatted_url = url[0]
+        if formatted_url in pocket_urls:
+            module_logger.debug("Skipping URL {0}".format(formatted_url))
+            continue
         new_urls["{0}".format(idx)] = {"url":formatted_url,
                                        "title":url[1]}
     params = {}
