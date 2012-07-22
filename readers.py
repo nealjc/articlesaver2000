@@ -18,6 +18,27 @@ SUCCESS = 3
 
 module_logger = logging.getLogger('readers')
 
+def _pocket_submitted_urls(name, pw, since=None):
+    """Return a list of URLs submitted to Pocket by this 
+    application since the given time.
+    """
+    if since:
+        since_param = '&since={0}'.format(since)
+    else:
+        since_param = ''
+    resp = requests.get('https://readitlaterlist.com/v2/get?username={0}&password={1}&apikey={2}&myAppOnly=1{3}'.format(name, pw, _POCKET_KEY, 
+                                                 since_param))
+    if resp.status_code != 200:
+        module_logger.error('Unable to get pocket URLs: {0}, {1}'.format(
+            resp.status_code, resp.headers.get('X-Error', None)))
+        return [], None
+    urls = []
+    json_resp = json.loads(resp.text)
+    since_resp = json_resp["since"]
+    for uid in json_resp["list"]:
+        urls.append(json_resp["list"][uid]["url"])
+    return urls, since_resp    
+
 def send_to_pocket(urls, name, pw):
     """Sends a list of urls to Pocket
     with the given name and password.
