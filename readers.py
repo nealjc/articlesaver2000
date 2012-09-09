@@ -66,7 +66,7 @@ def send_to_pocket(urls, name, pw):
         
     new_urls = {}
     for idx, url in enumerate(urls):
-        if not url[0].startswith("http://"):
+        if not url[0].startswith("http"):
             formatted_url = "http://" + url[0]
         else:
             formatted_url = url[0]
